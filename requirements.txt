@@ -1,0 +1,19 @@
+# Core application
+streamlit
+
+# Deep learning
+torch
+torchvision
+
+# Image processing
+Pillow
+opencv-python-headless
+
+# Data processing and evaluation
+numpy
+pandas
+scikit-learn
+
+# Visualization
+matplotlib
+altair
