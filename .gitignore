@@ -1,37 +1,35 @@
-
-# Python
+# Python cache
 __pycache__/
 *.py[cod]
-*.egg-info/
-dist/
-build/
 
 # Virtual environments
 .venv/
 venv/
 env/
 
-# Secrets and environment variables
+# Environment variables and secrets
 .env
 .env.*
-!.env.example
 
-# Jupyter
+# Jupyter Notebook
 .ipynb_checkpoints/
 
-# Editors and operating systems
+# Dataset
+data/
+!data/.gitkeep
+
+# Trained model weights
+*.pth
+*.pt
+*.h5
+*.keras
+
+# Generated results
+results/*
+!results/.gitkeep
+
+# IDE and OS files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-
-# Model weights and datasets
-*.pth
-*.pt
-*.onnx
-data/
-datasets/
-
-# Generated outputs
-outputs/
-logs/
