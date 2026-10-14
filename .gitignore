@@ -1,0 +1,37 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets and environment variables
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Model weights and datasets
+*.pth
+*.pt
+*.onnx
+data/
+datasets/
+
+# Generated outputs
+outputs/
+logs/
