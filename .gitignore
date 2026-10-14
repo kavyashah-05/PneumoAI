@@ -15,7 +15,7 @@ env/
 .ipynb_checkpoints/
 
 # Dataset
-data/
+data/*
 !data/.gitkeep
 
 # Trained model weights
