@@ -1,79 +1,153 @@
-# PneumoAI — Experimental Plan
+# PneumoAI — Experiment Plan
 
 ## 1. Objective
 
-The objective is to compare three deep learning approaches for binary pneumonia classification using chest X-ray images.
+The objective of this project is to compare three deep learning models for binary chest X-ray classification:
 
-## 2. Models Under Comparison
+- Baseline CNN
+- ResNet50
+- MobileNetV2
 
-1. **Baseline CNN:** A custom convolutional neural network serving as the baseline.
-2. **ResNet50:** A residual network evaluated using transfer learning.
-3. **MobileNetV2:** A lightweight convolutional neural network evaluated using transfer learning.
+The classification task consists of predicting NORMAL or PNEUMONIA from a chest X-ray image.
 
-The exact model configurations and training settings will be documented during implementation.
+Pneumonia is treated as the positive class for evaluation.
 
-## 3. Classification Task
+## 2. Research Questions
 
-The models will classify each image into one of two classes:
+The experiments are intended to investigate:
 
-- **NORMAL:** No pneumonia identified in the dataset label.
-- **PNEUMONIA:** Pneumonia identified in the dataset label.
+1. How does the Baseline CNN perform compared with ResNet50 and MobileNetV2?
+2. How do the models compare in terms of accuracy, precision, recall, F1-score, specificity, and ROC-AUC?
+3. How do the models differ in their false-positive and false-negative predictions?
+4. Can Grad-CAM visualizations help inspect the image regions associated with model outputs?
 
-Pneumonia will be treated as the positive class when calculating evaluation metrics.
+These questions describe the project's experimental objectives. They do not, by themselves, establish that every experiment has been completed.
 
-## 4. Dataset and Data Splits
+## 3. Dataset and Splits
 
-The dataset source, image counts, class distribution, and train/validation/test split will be verified and documented before training.
+The project uses the Chest X-Ray Images (Pneumonia) dataset.
 
-- **Training set:** Used to learn model parameters.
-- **Validation set:** Used for model selection and appropriate tuning decisions.
-- **Test set:** Reserved for final evaluation after model development and selection.
+The recorded dataset split sizes are:
 
-The test set must not be used to repeatedly tune model configurations or classification thresholds.
+| Split | Images |
+|---|---:|
+| Training | 4,172 |
+| Validation | 1,044 |
+| Test | 624 |
+| Total | 5,840 |
 
-## 5. Image Preprocessing
+The documented methodology describes an 80/20 training-validation split using `random_state=42`, with the original test set kept separate.
 
-Image resizing, image format, normalization, and other preprocessing requirements will be documented for each model.
+These counts and split procedures should be confirmed against the actual dataset and split-generation records before being treated as independently verified.
 
-Any model-specific preprocessing must be applied consistently during training, validation, and inference.
+## 4. Models Under Comparison
 
-Data augmentation, if used, will be applied only to the training data.
+### 4.1 Baseline CNN
 
-## 6. Evaluation Metrics
+A custom convolutional neural network serves as the baseline model. It uses grayscale input images resized to 224 × 224 pixels.
 
-All three models will be evaluated using:
+### 4.2 ResNet50
 
-- Accuracy
-- Precision
-- Recall (Sensitivity)
-- F1-score
-- Specificity
-- ROC-AUC
+ResNet50 uses an adapted final classification layer that produces one output for binary classification. Its inference pipeline uses RGB images resized to 224 × 224 pixels and ImageNet normalization.
 
-A confusion matrix will also be reported to examine false-positive and false-negative predictions.
+### 4.3 MobileNetV2
 
-## 7. Classification Threshold
+MobileNetV2 uses an adapted final classification layer that produces one output for binary classification. Its inference pipeline uses RGB images resized to 224 × 224 pixels and ImageNet normalization.
 
-The models' output scores and the threshold used to assign predicted classes will be documented.
+The architectures and inference preprocessing are implemented in `src/multi_model_inference.py`. The exact training configurations should be documented from the training records when available.
 
-Any threshold selection using validation data must be completed before final test evaluation. Output scores will not automatically be interpreted as calibrated clinical probabilities.
+## 5. Evaluation Metrics
 
-## 8. Explainability
+The project uses the following evaluation metrics to compare model performance.
 
-Grad-CAM will be used to generate heatmap visualizations for selected predictions. The target convolutional layer will be chosen according to each model's architecture.
+- **Accuracy:** proportion of all predictions classified correctly.
+- **Precision:** proportion of predicted positive cases that are actually positive.
+- **Recall (Sensitivity):** proportion of actual positive cases correctly identified.
+- **F1-score:** harmonic mean of precision and recall.
+- **Specificity:** proportion of actual negative cases correctly identified.
+- **ROC-AUC:** area under the receiver operating characteristic curve.
 
-These visualizations will be treated as exploratory explanations, not as verified pneumonia localization or clinical evidence.
+With pneumonia treated as the positive class:
 
-## 9. Reproducibility
+\[
+\text{Accuracy}=\frac{TP+TN}{TP+TN+FP+FN}
+\]
 
-The project will document relevant experimental settings, including model configuration, preprocessing, training parameters, random seeds where applicable, and evaluation procedures.
+\[
+\text{Precision}=\frac{TP}{TP+FP}
+\]
 
-Any limitations or differences that affect a fair model comparison will be reported.
+\[
+\text{Recall}=\frac{TP}{TP+FN}
+\]
 
-## 10. Research Limitations
+\[
+F1=2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}
+\]
 
-Results will be interpreted in the context of the selected dataset and experimental setup. Strong performance on one dataset does not establish generalization to other hospitals, populations, or imaging systems.
+\[
+\text{Specificity}=\frac{TN}{TN+FP}
+\]
 
-## 11. Status
+Here, \(TP\), \(TN\), \(FP\), and \(FN\) represent true positives, true negatives, false positives, and false negatives, respectively.
 
-This is a preliminary experimental plan. Dataset details and final experimental settings will be confirmed before model training and final evaluation.
+The reported metrics should be tied to the evaluation scripts and results that produced them. Values displayed in the Streamlit application are hard-coded and are not recalculated dynamically by the Model Comparison page.
+
+## 6. Classification Threshold
+
+The implemented inference pipeline applies the sigmoid function to each model's output and classifies scores using a threshold of 0.5:
+
+\[
+\hat{y}=
+\begin{cases}
+\text{Pneumonia}, & p\geq0.5\\
+\text{Normal}, & p<0.5
+\end{cases}
+\]
+
+Threshold analysis is a separate experimental consideration. Any alternative threshold should be documented with its selection method and evaluation results rather than presented as an experiment already completed without supporting evidence.
+
+Sigmoid scores should not automatically be interpreted as calibrated clinical probabilities.
+
+## 7. Error Analysis
+
+The project includes utilities for reviewing test mismatches and generating Grad-CAM visualizations.
+
+Relevant scripts include:
+
+- `review_test_mismatches.py`
+- `generate_gradcam_review.py`
+- `batch_gradcam_review.py`
+- `analyze_thresholds.py`
+
+The intended error analysis includes inspecting false positives and false negatives and examining Grad-CAM overlays for selected cases.
+
+The presence of these scripts does not establish that all analyses have been executed, reviewed, or documented. Completed analyses should be supported by their corresponding output files or execution records.
+
+## 8. Experiment Status and Reproducibility
+
+The project contains model inference implementations, evaluation utilities, and a Streamlit interface for comparing model outputs.
+
+However, a complete reproducible experimental record should also identify, where available:
+
+- Training configurations and hyperparameters.
+- Random seeds and split-generation details.
+- Checkpoint provenance.
+- Evaluation commands and output files.
+- The source of each reported metric.
+- Any threshold-selection procedure.
+- The exact dataset version used.
+
+Do not describe an experiment as completed or reproducible solely because a corresponding script exists.
+
+## 9. Limitations
+
+The experiment compares models on a particular chest X-ray dataset. Results may be affected by dataset composition, image quality, class distribution, duplicate images, and possible differences between training and evaluation preprocessing.
+
+Grad-CAM visualizations provide approximate explanations and do not prove that predictions are medically correct.
+
+The project is an educational research prototype and is not a clinically validated diagnostic system.
+
+## 10. Summary
+
+This experiment plan defines the models, evaluation metrics, and error-analysis methods used or intended for the PneumoAI project. Claims about completed experiments and reported performance should be supported by actual execution records and verified results.
