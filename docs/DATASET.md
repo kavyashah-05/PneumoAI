@@ -1,57 +1,107 @@
 # PneumoAI — Dataset Documentation
 
-## 1. Purpose
+## 1. Dataset Overview
 
-This document records the dataset used for PneumoAI's pneumonia classification experiments. Dataset details must be verified against the actual data and project records before training or final evaluation.
+PneumoAI uses the **Chest X-Ray Images (Pneumonia)** dataset for binary chest X-ray image classification.
+
+The two target classes are:
+
+- **NORMAL** — chest X-ray images labelled as normal.
+- **PNEUMONIA** — chest X-ray images labelled as pneumonia.
+
+The project uses this dataset to develop and evaluate three deep learning models: Baseline CNN, ResNet50, and MobileNetV2.
 
 ## 2. Dataset Source
 
-- **Dataset name:** To be verified.
-- **Original source or repository:** To be recorded.
-- **Access date or version:** To be recorded.
-- **License and permitted use:** To be verified and documented.
+- **Dataset name:** Chest X-Ray Images (Pneumonia)
+- **Dataset source:** Kaggle
+- **Dataset identifier:** `paultimothymooney/chest-xray-pneumonia`
+- **Expected dataset directory:** `chest_xray/chest_xray/`
 
-## 3. Classification Labels
+The dataset is associated with the Kaggle dataset identifier above. The exact downloaded copy and its contents should be checked against the files available in the project environment.
 
-The project uses two image classes:
+## 3. Dataset Splits
 
-- **NORMAL:** Image labeled as normal in the dataset.
-- **PNEUMONIA:** Image labeled as pneumonia in the dataset.
+The project uses training, validation, and test data.
 
-Pneumonia is treated as the positive class for evaluation.
+The training portion was divided into training and validation subsets using an 80/20 split, with `random_state=42`, as described in the project's methodology.
 
-## 4. Dataset Splits
+The project records the following split sizes:
 
-The dataset's training, validation, and test splits will be recorded after checking the actual dataset and its accompanying documentation.
+| Split | Number of images | Status |
+|---|---:|---|
+| Training | 4,172 | Recorded project count |
+| Validation | 1,044 | Recorded project count |
+| Test | 624 | Recorded project count |
+| **Total** | **5,840** | **Sum of the recorded counts** |
 
-| Split | Image count | NORMAL count | PNEUMONIA count |
-|---|---:|---:|---:|
-| Training | To verify | To verify | To verify |
-| Validation | To verify | To verify | To verify |
-| Test | To verify | To verify | To verify |
+The original test set is described as being kept separate from the training/validation split.
 
-Counts must be checked against the data actually used in the experiments.
+These figures document the counts recorded by the project. They should be confirmed against the actual dataset files and split-generation procedure before being treated as independently verified counts.
 
-## 5. Data Integrity Checks
+## 4. Labels and Classification Task
 
-Before model training, the project should verify:
+The project performs binary classification using the following labels:
 
-- Image counts and class distribution for each split.
-- Whether images can be opened and processed.
+| Label | Meaning |
+|---|---|
+| NORMAL | Image labelled as normal |
+| PNEUMONIA | Image labelled as pneumonia |
+
+Pneumonia is treated as the positive class when interpreting evaluation metrics.
+
+The models produce a score through a sigmoid function. The current inference implementation uses a threshold of 0.5 to assign the predicted class.
+
+## 5. Preprocessing
+
+The input preprocessing depends on the model.
+
+### Baseline CNN
+
+- Convert the image to grayscale.
+- Resize the image to 224 × 224 pixels.
+- Convert the image to a tensor.
+- Do not apply ImageNet normalization in the implemented inference transform.
+
+### ResNet50 and MobileNetV2
+
+- Convert the image to RGB.
+- Resize the image to 224 × 224 pixels.
+- Convert the image to a tensor.
+- Apply ImageNet normalization using the channel-wise means `[0.485, 0.456, 0.406]` and standard deviations `[0.229, 0.224, 0.225]`.
+
+These steps describe the inference preprocessing implemented in `src/inference.py` and `src/multi_model_inference.py`. The training pipeline should be checked separately to confirm that its preprocessing is consistent.
+
+## 6. Data Integrity and Verification
+
+The repository contains utilities for dataset and evaluation checks, including:
+
+- `audit_dataset.py`
+- `check_dataset_duplicates.py`
+- `verify_dataset_counts.py`
+- `verify_saved_model_vs_csv.py`
+- `verify_test_metrics.py`
+
+The existence of these scripts does not establish that every check has been run successfully.
+
+Before declaring the dataset fully verified, confirm:
+
+- The downloaded dataset's source and directory structure.
+- The number of images in each split and class.
 - Whether duplicate or overlapping images exist across splits.
-- Whether the provided split organization is preserved.
-- Whether any preprocessing or filtering changes the dataset counts.
+- Whether the validation set was generated exclusively from the training data.
+- Whether preprocessing used during training matches the expected model inputs.
 
-## 6. Preprocessing
+## 7. Licensing and Usage
 
-The image size, color-channel handling, normalization, and any other preprocessing steps will be documented once verified from the actual model pipelines.
+The applicable dataset license and redistribution terms have not been independently verified in this document.
 
-Training-only augmentation, if used, will be recorded separately.
+Check the dataset's original source page and accompanying license information before redistributing images or claiming particular usage permissions. Do not assume that the dataset is unrestricted or that its images may be redistributed freely.
 
-## 7. Data Limitations
+## 8. Limitations
 
-Dataset composition, labeling quality, collection setting, and representativeness may affect model performance. Results should be interpreted in the context of the dataset used and should not be assumed to generalize to every clinical setting.
+Dataset labels and model predictions should not be interpreted as definitive clinical findings.
 
-## 8. Verification Status
+The dataset's composition, image quality, class distribution, and potential overlap between splits can affect evaluation results. Results obtained from this dataset alone do not establish generalization to other hospitals, populations, imaging equipment, or clinical settings.
 
-Dataset source, license, split counts, and integrity checks remain to be verified against the project data and supporting records. This document will be updated when those checks are complete.
+PneumoAI is an educational research prototype and is not a clinically validated diagnostic system.
