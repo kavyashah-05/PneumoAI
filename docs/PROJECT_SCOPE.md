@@ -2,74 +2,133 @@
 
 ## 1. Project Overview
 
-PneumoAI is a deep learning research project focused on detecting pneumonia from chest X-ray images. It aims to compare a custom Convolutional Neural Network (CNN) with transfer learning models and provide visual explanations of model predictions.
+PneumoAI is an educational deep learning research prototype for classifying chest X-ray images into two categories: NORMAL and PNEUMONIA.
 
-The project is intended for academic research and experimentation, not for clinical diagnosis.
+The project compares three models: Baseline CNN, ResNet50, and MobileNetV2. A Streamlit interface provides image-based inference, model comparison, and Grad-CAM visualizations.
+
+The project is intended for educational and research purposes, not for clinical diagnosis.
 
 ## 2. Project Objectives
 
-- Develop a baseline CNN for binary classification of chest X-ray images.
-- Compare the baseline model with ResNet50 and MobileNetV2.
-- Evaluate model performance using multiple classification metrics.
-- Apply Grad-CAM to visualize image regions influencing model predictions.
-- Provide an interface for exploring predictions and model comparisons.
-- Maintain a reproducible and well-documented research workflow.
+The main objectives are to:
 
-## 3. Classification Task
+- Implement three deep learning models for binary chest X-ray classification.
+- Compare their predictions and recorded evaluation metrics.
+- Provide a user interface for uploading and analyzing chest X-ray images.
+- Generate Grad-CAM visualizations to inspect regions associated with model outputs.
+- Provide utilities for dataset auditing, threshold analysis, and evaluation verification.
+- Document the system architecture, dataset, experimental plan, and testing approach.
 
-The system classifies chest X-ray images into two categories:
+## 3. In-Scope Features
 
-- **NORMAL:** No pneumonia identified in the dataset label.
-- **PNEUMONIA:** Pneumonia identified in the dataset label.
+### 3.1 Image Classification
 
-Pneumonia is treated as the positive class during evaluation.
+The implemented inference modules support classification into NORMAL and PNEUMONIA using:
 
-## 4. Planned Models
+- Baseline CNN
+- ResNet50
+- MobileNetV2
 
-1. Baseline CNN — a custom convolutional neural network.
-2. ResNet50 — a residual network used for transfer learning.
-3. MobileNetV2 — a lightweight architecture used for transfer learning.
+The models produce sigmoid scores and predicted classes using a threshold of 0.5.
 
-The models will be evaluated under documented preprocessing and evaluation settings.
+### 3.2 Image Upload and User Interface
 
-## 5. Evaluation Metrics
+The Streamlit application supports PNG, JPG, and JPEG uploads through its image-detection interface.
 
-The project will report:
+It presents predictions from the three models and handles prediction errors through the interface.
 
-- Accuracy
-- Precision
-- Recall (Sensitivity)
-- F1-score
-- Specificity
-- ROC-AUC
+### 3.3 Model Comparison
 
-The confusion matrix will also be used to examine classification errors.
+The application displays recorded evaluation metrics, including accuracy, precision, recall, F1-score, specificity, and ROC-AUC, alongside confusion matrices.
 
-## 6. Explainability
+The displayed metrics and confusion matrices are hard-coded in the application rather than dynamically calculated by the comparison page.
 
-Grad-CAM will be used to generate heatmap overlays that highlight image regions contributing to model predictions. The target convolutional layer will be selected according to each model architecture.
+### 3.4 Model Explainability
 
-These visualizations are exploratory explanations, not verified pneumonia segmentations or clinical evidence.
+The project implements Grad-CAM generation for all three models. The generated overlays can be used to inspect image regions associated with each model's output.
 
-## 7. Intended Application Features
+Grad-CAM visualizations are approximate and do not establish that a prediction is correct or clinically meaningful.
 
-- Chest X-ray image input.
-- Predictions from the three models.
-- Display of model scores and predicted classes.
-- Grad-CAM visualizations.
-- Model comparison and evaluation summaries.
-- Research methodology and project documentation.
+### 3.5 Dataset and Evaluation Utilities
 
-The final interface and feature list will be confirmed against the implementation and current research design.
+The repository includes scripts for dataset auditing, duplicate checking, count verification, threshold analysis, test-mismatch review, Grad-CAM review, and evaluation checks.
 
-## 8. Scope Limitations
+The presence of these scripts does not imply that every check has been run successfully.
 
-- The task is limited to binary NORMAL/PNEUMONIA classification.
-- Model outputs are not assumed to be calibrated clinical probabilities.
-- Performance on the selected dataset does not establish generalization to all hospitals, populations, or imaging equipment.
-- The system is not intended to replace professional medical assessment.
-- Dataset provenance, split integrity, preprocessing, and evaluation settings must be documented and verified.
+## 4. Out-of-Scope Features
 
-## 9. Expected Outcome
+The following are outside the current project's established scope:
 
-The expected outcome is a reproducible research prototype that compares three deep learning approaches, evaluates their classification performance, and explores prediction explainability using Grad-CAM.
+- Clinical diagnosis or treatment recommendations.
+- Clinical deployment or integration into hospital workflows.
+- Guaranteed detection of pneumonia in every patient.
+- A claim of clinical validation or regulatory approval.
+- Automated medical reporting or treatment planning.
+- A guarantee that sigmoid scores represent calibrated clinical probabilities.
+
+These exclusions describe the intended boundaries of the educational prototype.
+
+## 5. Technical Scope
+
+The implementation uses Python, PyTorch, torchvision, Streamlit, Pillow, NumPy, and OpenCV.
+
+The primary application and inference files are:
+
+- `app.py`
+- `src/inference.py`
+- `src/multi_model_inference.py`
+
+The expected trained model checkpoints are:
+
+- `models/baseline_cnn.pth`
+- `models/resnet50_pneumonia.pth`
+- `models/mobilenetv2_pneumonia.pth`
+
+The corresponding checkpoint files must be present and compatible with the model architectures for inference to work.
+
+## 6. Assumptions and Dependencies
+
+The project assumes that:
+
+- The required Python dependencies are installed.
+- Compatible trained model checkpoints are available.
+- Input images can be opened and converted to the required image formats.
+- Dataset counts and evaluation values are checked against their original records before being reported as verified results.
+- Optional example images and saved visualizations are available if those interface sections are expected to display them.
+
+## 7. Limitations
+
+The current prototype has several limitations:
+
+- It performs binary classification only.
+- It uses a fixed classification threshold of 0.5.
+- Model scores are not necessarily calibrated probabilities.
+- Reported evaluation values are displayed as recorded constants in the Streamlit interface.
+- Some example images and visualization assets may be absent from the repository.
+- Grad-CAM provides approximate visual explanations rather than proof of model reasoning.
+- Performance on one dataset does not establish generalization to other clinical environments.
+
+## 8. Deliverables
+
+The project deliverables include:
+
+- Three model inference implementations.
+- A Streamlit application for prediction and model comparison.
+- Grad-CAM generation functionality.
+- Dataset and evaluation utility scripts.
+- Project documentation covering architecture, dataset, experimental planning, scope, structure, and testing.
+
+The completion and reproducibility of individual experiments should be established from their execution records and saved outputs.
+
+## 9. Success Criteria
+
+The project is considered technically demonstrable when:
+
+- The three models can be loaded from compatible checkpoints.
+- Each model can process an appropriate input image and return a prediction.
+- The Streamlit interface can display model predictions.
+- Grad-CAM overlays can be generated for the supported models.
+- Evaluation values and their sources are documented clearly.
+- The documented limitations and non-clinical intended use are explicit.
+
+These criteria describe the intended technical demonstration; they should not be interpreted as proof that every item has been tested successfully.
